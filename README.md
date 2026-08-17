@@ -1,6 +1,6 @@
 # Cutpoint Agent
 
-Decides where to cut a video into clips by reconciling three disagreeing
+An agent that decides where to cut a video into clips by reconciling three disagreeing
 sources of evidence: a punctuated transcript, word-level timings from speech
 recognition, and direct analysis of the waveform.
 
