@@ -1,0 +1,861 @@
+{
+  "summary": {
+    "audio": "output\\audio.wav",
+    "duration_s": 115.61,
+    "generated": "2026-08-17T10:22:32",
+    "proposed": 26,
+    "accepted": 4,
+    "shifted": 14,
+    "rejected": 8,
+    "final_cut_count": 18,
+    "targeted_reanalyses": 3
+  },
+  "cuts": [
+    {
+      "time": 8.961,
+      "original_time": 8.76,
+      "moved_by": 0.201,
+      "status": "shifted",
+      "confidence": 0.9,
+      "conflict_type": "alignment_drift",
+      "trusted_source": "audio",
+      "rationale": "'.' after \"agent.\"; nearest silence begins 0.05s away \u2014 routine drift, snap to audio",
+      "context": "...agent. | The...",
+      "decision_history": [
+        "moved +0.20s: corrected +0.20s into 4.75s silence (8.81\u201313.56)"
+      ],
+      "evidence": {
+        "mark": ".",
+        "word_probability": 0.993,
+        "drift_s": 0.051,
+        "relation": "begins"
+      }
+    },
+    {
+      "time": 17.368,
+      "original_time": 17.2,
+      "moved_by": 0.168,
+      "status": "shifted",
+      "confidence": 0.9,
+      "conflict_type": "alignment_drift",
+      "trusted_source": "audio",
+      "rationale": "'.' after \"speech.\"; nearest silence begins 0.02s away \u2014 routine drift, snap to audio",
+      "context": "...speech. | The...",
+      "decision_history": [
+        "moved +0.17s: corrected +0.17s into 3.56s silence (17.22\u201320.78)"
+      ],
+      "evidence": {
+        "mark": ".",
+        "word_probability": 0.967,
+        "drift_s": 0.018,
+        "relation": "begins"
+      }
+    },
+    {
+      "time": 24.269,
+      "original_time": 24.7,
+      "moved_by": -0.431,
+      "status": "shifted",
+      "confidence": 0.6,
+      "conflict_type": "alignment_drift",
+      "trusted_source": "audio",
+      "rationale": "';' after \"here;\"; nearest silence ended 0.17s away \u2014 routine drift, snap to audio",
+      "context": "...here; | the...",
+      "decision_history": [
+        "moved -0.43s: corrected -0.43s into 0.41s silence (24.12\u201324.53)"
+      ],
+      "evidence": {
+        "mark": ";",
+        "word_probability": 0.859,
+        "drift_s": 0.168,
+        "relation": "ended"
+      }
+    },
+    {
+      "time": 26.691,
+      "original_time": 26.58,
+      "moved_by": 0.111,
+      "status": "accepted",
+      "confidence": 0.95,
+      "conflict_type": "agreement",
+      "trusted_source": "both",
+      "rationale": "'.' after \"all.\", inside 2.60s silence",
+      "context": "...all. | The...",
+      "decision_history": [
+        "confirmed inside 2.60s silence; padded +0.11s"
+      ],
+      "evidence": {
+        "mark": ".",
+        "word_probability": 0.997
+      }
+    },
+    {
+      "time": 40.24,
+      "original_time": 39.82,
+      "moved_by": 0.42,
+      "status": "shifted",
+      "confidence": 0.9,
+      "conflict_type": "alignment_drift",
+      "trusted_source": "audio",
+      "rationale": "'.' after \"later.\"; nearest silence begins 0.27s away \u2014 routine drift, snap to audio",
+      "context": "...later. | I...",
+      "decision_history": [
+        "moved +0.42s: corrected +0.42s into 1.47s silence (40.09\u201341.56)"
+      ],
+      "evidence": {
+        "mark": ".",
+        "word_probability": 0.99,
+        "drift_s": 0.27,
+        "relation": "begins"
+      }
+    },
+    {
+      "time": 50.649,
+      "original_time": 50.34,
+      "moved_by": 0.309,
+      "status": "shifted",
+      "confidence": 0.9,
+      "conflict_type": "alignment_drift",
+      "trusted_source": "audio",
+      "rationale": "'.' after \"files.\"; nearest silence begins 0.16s away \u2014 routine drift, snap to audio",
+      "context": "...files. | I...",
+      "decision_history": [
+        "moved +0.31s: corrected +0.31s into 2.16s silence (50.50\u201352.66)"
+      ],
+      "evidence": {
+        "mark": ".",
+        "word_probability": 0.985,
+        "drift_s": 0.159,
+        "relation": "begins"
+      }
+    },
+    {
+      "time": 56.657,
+      "original_time": 56.6,
+      "moved_by": 0.057,
+      "status": "accepted",
+      "confidence": 0.4,
+      "conflict_type": "agreement",
+      "trusted_source": "both",
+      "rationale": "',' after \"timings,\", inside 1.31s silence",
+      "context": "...timings, | punctuation...",
+      "decision_history": [
+        "confirmed inside 1.31s silence; padded +0.06s"
+      ],
+      "evidence": {
+        "mark": ",",
+        "word_probability": 0.934
+      }
+    },
+    {
+      "time": 59.603,
+      "original_time": 59.757,
+      "moved_by": -0.154,
+      "status": "accepted",
+      "confidence": 0.35,
+      "conflict_type": "acoustics_without_semantics",
+      "trusted_source": "audio",
+      "rationale": "0.61s silence between content words \"passing\" and \"conflict\" \u2014 transcript may be missing punctuation",
+      "context": "...passing | conflict...",
+      "decision_history": [
+        "confirmed inside 0.61s silence; padded -0.15s"
+      ],
+      "evidence": {
+        "before": "passing",
+        "after": "conflict",
+        "duration_s": 0.61,
+        "verdict": "possible missing punctuation"
+      }
+    },
+    {
+      "time": 66.779,
+      "original_time": 66.4,
+      "moved_by": 0.379,
+      "status": "shifted",
+      "confidence": 0.9,
+      "conflict_type": "alignment_drift",
+      "trusted_source": "audio",
+      "rationale": "'.' after \"loop.\"; nearest silence begins 0.23s away \u2014 routine drift, snap to audio",
+      "context": "...loop. | This...",
+      "decision_history": [
+        "moved +0.38s: corrected +0.38s into 1.04s silence (66.63\u201367.67)"
+      ],
+      "evidence": {
+        "mark": ".",
+        "word_probability": 0.996,
+        "drift_s": 0.229,
+        "relation": "begins"
+      }
+    },
+    {
+      "time": 71.616,
+      "original_time": 71.52,
+      "moved_by": 0.096,
+      "status": "accepted",
+      "confidence": 0.95,
+      "conflict_type": "agreement",
+      "trusted_source": "both",
+      "rationale": "'.' after \"interesting.\", inside 3.16s silence",
+      "context": "...interesting. | Breathing...",
+      "decision_history": [
+        "confirmed inside 3.16s silence; padded +0.10s"
+      ],
+      "evidence": {
+        "mark": ".",
+        "word_probability": 0.997
+      }
+    },
+    {
+      "time": 76.749,
+      "original_time": 76.26,
+      "moved_by": 0.489,
+      "status": "shifted",
+      "confidence": 0.35,
+      "conflict_type": "alignment_drift",
+      "trusted_source": "audio",
+      "rationale": "',' after \"quiet,\"; nearest silence begins 0.30s away \u2014 routine drift, snap to audio",
+      "context": "...quiet, | but...",
+      "decision_history": [
+        "moved +0.49s: corrected +0.49s into 0.31s silence (76.60\u201376.91)"
+      ],
+      "evidence": {
+        "mark": ",",
+        "word_probability": 0.994,
+        "drift_s": 0.299,
+        "relation": "begins"
+      }
+    },
+    {
+      "time": 78.993,
+      "original_time": 78.56,
+      "moved_by": 0.433,
+      "status": "shifted",
+      "confidence": 0.9,
+      "conflict_type": "alignment_drift",
+      "trusted_source": "audio",
+      "rationale": "'.' after \"silence.\"; nearest silence begins 0.28s away \u2014 routine drift, snap to audio",
+      "context": "...silence. | When...",
+      "decision_history": [
+        "moved +0.43s: corrected +0.43s into 1.72s silence (78.84\u201380.56)"
+      ],
+      "evidence": {
+        "mark": ".",
+        "word_probability": 0.787,
+        "drift_s": 0.282,
+        "relation": "begins"
+      }
+    },
+    {
+      "time": 82.813,
+      "original_time": 82.34,
+      "moved_by": 0.473,
+      "status": "shifted",
+      "confidence": 0.35,
+      "conflict_type": "alignment_drift",
+      "trusted_source": "audio",
+      "rationale": "',' after \"disagree,\"; nearest silence begins 0.32s away \u2014 routine drift, snap to audio",
+      "context": "...disagree, | the...",
+      "decision_history": [
+        "moved +0.47s: corrected +0.47s into 0.94s silence (82.66\u201383.61)"
+      ],
+      "evidence": {
+        "mark": ",",
+        "word_probability": 0.987,
+        "drift_s": 0.323,
+        "relation": "begins"
+      }
+    },
+    {
+      "time": 87.07,
+      "original_time": 86.82,
+      "moved_by": 0.25,
+      "status": "shifted",
+      "confidence": 0.9,
+      "conflict_type": "alignment_drift",
+      "trusted_source": "audio",
+      "rationale": "'.' after \"trust.\"; nearest silence begins 0.10s away \u2014 routine drift, snap to audio",
+      "context": "...trust. | There...",
+      "decision_history": [
+        "moved +0.25s: corrected +0.25s into 2.74s silence (86.92\u201389.66)"
+      ],
+      "evidence": {
+        "mark": ".",
+        "word_probability": 0.998,
+        "drift_s": 0.1,
+        "relation": "begins"
+      }
+    },
+    {
+      "time": 92.871,
+      "original_time": 92.5,
+      "moved_by": 0.371,
+      "status": "shifted",
+      "confidence": 0.35,
+      "conflict_type": "alignment_drift",
+      "trusted_source": "audio",
+      "rationale": "',' after \"handled,\"; nearest silence begins 0.22s away \u2014 routine drift, snap to audio",
+      "context": "...handled, | like...",
+      "decision_history": [
+        "moved +0.37s: corrected +0.37s into 0.52s silence (92.72\u201393.24)"
+      ],
+      "evidence": {
+        "mark": ",",
+        "word_probability": 0.991,
+        "drift_s": 0.221,
+        "relation": "begins"
+      }
+    },
+    {
+      "time": 96.695,
+      "original_time": 96.46,
+      "moved_by": 0.235,
+      "status": "shifted",
+      "confidence": 0.35,
+      "conflict_type": "alignment_drift",
+      "trusted_source": "audio",
+      "rationale": "',' after \"speakers,\"; nearest silence begins 0.09s away \u2014 routine drift, snap to audio",
+      "context": "...speakers, | but...",
+      "decision_history": [
+        "moved +0.23s: corrected +0.23s into 1.00s silence (96.55\u201397.55)"
+      ],
+      "evidence": {
+        "mark": ",",
+        "word_probability": 0.994,
+        "drift_s": 0.085,
+        "relation": "begins"
+      }
+    },
+    {
+      "time": 106.732,
+      "original_time": 106.5,
+      "moved_by": 0.232,
+      "status": "shifted",
+      "confidence": 0.9,
+      "conflict_type": "alignment_drift",
+      "trusted_source": "audio",
+      "rationale": "'.' after \"have.\"; nearest silence begins 0.08s away \u2014 routine drift, snap to audio",
+      "context": "...have. | This...",
+      "decision_history": [
+        "moved +0.23s: corrected +0.23s into 2.92s silence (106.58\u2013109.50)"
+      ],
+      "evidence": {
+        "mark": ".",
+        "word_probability": 0.999,
+        "drift_s": 0.082,
+        "relation": "begins"
+      }
+    },
+    {
+      "time": 111.635,
+      "original_time": 111.22,
+      "moved_by": 0.415,
+      "status": "shifted",
+      "confidence": 0.35,
+      "conflict_type": "alignment_drift",
+      "trusted_source": "audio",
+      "rationale": "',' after \"recording,\"; nearest silence begins 0.26s away \u2014 routine drift, snap to audio",
+      "context": "...recording, | and...",
+      "decision_history": [
+        "moved +0.42s: corrected +0.42s into 0.44s silence (111.48\u2013111.93)"
+      ],
+      "evidence": {
+        "mark": ",",
+        "word_probability": 0.999,
+        "drift_s": 0.259,
+        "relation": "begins"
+      }
+    }
+  ],
+  "rejected": [
+    {
+      "time": 68.21,
+      "original_time": 68.21,
+      "moved_by": 0,
+      "status": "rejected",
+      "confidence": 0.37,
+      "conflict_type": "acoustics_without_semantics",
+      "trusted_source": "audio",
+      "rationale": "0.87s silence between content words \"loop\" and \"this\" \u2014 transcript may be missing punctuation",
+      "context": "...loop | this...",
+      "decision_history": [
+        "rejected: would leave a 1.43s clip against the cut at 66.78s"
+      ],
+      "evidence": {
+        "before": "loop",
+        "after": "this",
+        "duration_s": 0.87,
+        "verdict": "possible missing punctuation"
+      }
+    },
+    {
+      "time": 112.98,
+      "original_time": 112.98,
+      "moved_by": 0,
+      "status": "rejected",
+      "confidence": 0.36,
+      "conflict_type": "semantics_without_acoustics",
+      "trusted_source": "audio",
+      "rationale": "'.' after \"you.\" but no silence within 0.35s \u2014 punctuation may reflect grammar rather than delivery",
+      "context": "...you. | <end>...",
+      "decision_history": [
+        "rejected: no silence within 0.75s \u2014 transcript asserts a boundary the audio does not support"
+      ],
+      "evidence": {
+        "mark": ".",
+        "word_probability": 0.992
+      }
+    },
+    {
+      "time": 54.68,
+      "original_time": 54.68,
+      "moved_by": 0,
+      "status": "rejected",
+      "confidence": 0.35,
+      "conflict_type": "alignment_drift",
+      "trusted_source": "audio",
+      "rationale": "',' after \"detection,\"; nearest silence begins 0.23s away \u2014 routine drift, snap to audio",
+      "context": "...detection, | word...",
+      "decision_history": [
+        "rejected: would leave a 1.46s clip against the cut at 56.66s"
+      ],
+      "evidence": {
+        "mark": ",",
+        "word_probability": 0.833,
+        "drift_s": 0.231,
+        "relation": "begins"
+      }
+    },
+    {
+      "time": 33.987,
+      "original_time": 33.987,
+      "moved_by": 0,
+      "status": "rejected",
+      "confidence": 0.15,
+      "conflict_type": "acoustics_without_semantics",
+      "trusted_source": "transcript",
+      "rationale": "5.54s silence but preceded by \"was\" \u2014 hesitation mid-clause, not a boundary",
+      "context": "...was | ship...",
+      "decision_history": [
+        "rejected: confidence 0.15 below threshold 0.3 \u2014 acoustics_without_semantics"
+      ],
+      "evidence": {
+        "before": "was",
+        "after": "ship",
+        "duration_s": 5.54,
+        "verdict": "hesitation"
+      }
+    },
+    {
+      "time": 45.666,
+      "original_time": 45.666,
+      "moved_by": 0,
+      "status": "rejected",
+      "confidence": 0.15,
+      "conflict_type": "acoustics_without_semantics",
+      "trusted_source": "transcript",
+      "rationale": "3.14s silence but preceded by \"is\" \u2014 hesitation mid-clause, not a boundary",
+      "context": "...is | that...",
+      "decision_history": [
+        "rejected: confidence 0.15 below threshold 0.3 \u2014 acoustics_without_semantics"
+      ],
+      "evidence": {
+        "before": "is",
+        "after": "that",
+        "duration_s": 3.14,
+        "verdict": "hesitation"
+      }
+    },
+    {
+      "time": 63.035,
+      "original_time": 63.035,
+      "moved_by": 0,
+      "status": "rejected",
+      "confidence": 0.15,
+      "conflict_type": "acoustics_without_semantics",
+      "trusted_source": "transcript",
+      "rationale": "3.07s silence but followed by \"and\" \u2014 hesitation mid-clause, not a boundary",
+      "context": "...resolution | and...",
+      "decision_history": [
+        "rejected: confidence 0.15 below threshold 0.3 \u2014 acoustics_without_semantics"
+      ],
+      "evidence": {
+        "before": "resolution",
+        "after": "and",
+        "duration_s": 3.07,
+        "verdict": "hesitation"
+      }
+    },
+    {
+      "time": 99.868,
+      "original_time": 99.868,
+      "moved_by": 0,
+      "status": "rejected",
+      "confidence": 0.15,
+      "conflict_type": "acoustics_without_semantics",
+      "trusted_source": "transcript",
+      "rationale": "3.49s silence but preceded by \"but\" \u2014 hesitation mid-clause, not a boundary",
+      "context": "...but | those...",
+      "decision_history": [
+        "rejected: confidence 0.15 below threshold 0.3 \u2014 acoustics_without_semantics"
+      ],
+      "evidence": {
+        "before": "but",
+        "after": "those",
+        "duration_s": 3.49,
+        "verdict": "hesitation"
+      }
+    },
+    {
+      "time": 103.978,
+      "original_time": 103.978,
+      "moved_by": 0,
+      "status": "rejected",
+      "confidence": 0.15,
+      "conflict_type": "acoustics_without_semantics",
+      "trusted_source": "transcript",
+      "rationale": "1.08s silence but followed by \"for\" \u2014 hesitation mid-clause, not a boundary",
+      "context": "...scope | for...",
+      "decision_history": [
+        "rejected: confidence 0.15 below threshold 0.3 \u2014 acoustics_without_semantics"
+      ],
+      "evidence": {
+        "before": "scope",
+        "after": "for",
+        "duration_s": 1.08,
+        "verdict": "hesitation"
+      }
+    }
+  ],
+  "audit_log": [
+    {
+      "step": 1,
+      "action": "PROPOSED",
+      "time": 26.58,
+      "detail": "'.' after \"all.\", inside 2.60s silence"
+    },
+    {
+      "step": 2,
+      "action": "ACCEPTED",
+      "time": 26.58,
+      "detail": "confirmed inside 2.60s silence; padded +0.11s"
+    },
+    {
+      "step": 3,
+      "action": "PROPOSED",
+      "time": 71.52,
+      "detail": "'.' after \"interesting.\", inside 3.16s silence"
+    },
+    {
+      "step": 4,
+      "action": "ACCEPTED",
+      "time": 71.52,
+      "detail": "confirmed inside 3.16s silence; padded +0.10s"
+    },
+    {
+      "step": 5,
+      "action": "PROPOSED",
+      "time": 8.76,
+      "detail": "'.' after \"agent.\"; nearest silence begins 0.05s away \u2014 routine drift, snap to a"
+    },
+    {
+      "step": 6,
+      "action": "SHIFTED",
+      "time": 8.961,
+      "detail": "+0.20s \u2014 corrected +0.20s into 4.75s silence (8.81\u201313.56)"
+    },
+    {
+      "step": 7,
+      "action": "PROPOSED",
+      "time": 17.2,
+      "detail": "'.' after \"speech.\"; nearest silence begins 0.02s away \u2014 routine drift, snap to "
+    },
+    {
+      "step": 8,
+      "action": "SHIFTED",
+      "time": 17.368,
+      "detail": "+0.17s \u2014 corrected +0.17s into 3.56s silence (17.22\u201320.78)"
+    },
+    {
+      "step": 9,
+      "action": "PROPOSED",
+      "time": 39.82,
+      "detail": "'.' after \"later.\"; nearest silence begins 0.27s away \u2014 routine drift, snap to a"
+    },
+    {
+      "step": 10,
+      "action": "SHIFTED",
+      "time": 40.24,
+      "detail": "+0.42s \u2014 corrected +0.42s into 1.47s silence (40.09\u201341.56)"
+    },
+    {
+      "step": 11,
+      "action": "PROPOSED",
+      "time": 50.34,
+      "detail": "'.' after \"files.\"; nearest silence begins 0.16s away \u2014 routine drift, snap to a"
+    },
+    {
+      "step": 12,
+      "action": "SHIFTED",
+      "time": 50.649,
+      "detail": "+0.31s \u2014 corrected +0.31s into 2.16s silence (50.50\u201352.66)"
+    },
+    {
+      "step": 13,
+      "action": "PROPOSED",
+      "time": 66.4,
+      "detail": "'.' after \"loop.\"; nearest silence begins 0.23s away \u2014 routine drift, snap to au"
+    },
+    {
+      "step": 14,
+      "action": "SHIFTED",
+      "time": 66.779,
+      "detail": "+0.38s \u2014 corrected +0.38s into 1.04s silence (66.63\u201367.67)"
+    },
+    {
+      "step": 15,
+      "action": "PROPOSED",
+      "time": 78.56,
+      "detail": "'.' after \"silence.\"; nearest silence begins 0.28s away \u2014 routine drift, snap to"
+    },
+    {
+      "step": 16,
+      "action": "SHIFTED",
+      "time": 78.993,
+      "detail": "+0.43s \u2014 corrected +0.43s into 1.72s silence (78.84\u201380.56)"
+    },
+    {
+      "step": 17,
+      "action": "PROPOSED",
+      "time": 86.82,
+      "detail": "'.' after \"trust.\"; nearest silence begins 0.10s away \u2014 routine drift, snap to a"
+    },
+    {
+      "step": 18,
+      "action": "SHIFTED",
+      "time": 87.07,
+      "detail": "+0.25s \u2014 corrected +0.25s into 2.74s silence (86.92\u201389.66)"
+    },
+    {
+      "step": 19,
+      "action": "PROPOSED",
+      "time": 106.5,
+      "detail": "'.' after \"have.\"; nearest silence begins 0.08s away \u2014 routine drift, snap to au"
+    },
+    {
+      "step": 20,
+      "action": "SHIFTED",
+      "time": 106.732,
+      "detail": "+0.23s \u2014 corrected +0.23s into 2.92s silence (106.58\u2013109.50)"
+    },
+    {
+      "step": 21,
+      "action": "PROPOSED",
+      "time": 24.7,
+      "detail": "';' after \"here;\"; nearest silence ended 0.17s away \u2014 routine drift, snap to aud"
+    },
+    {
+      "step": 22,
+      "action": "RE-ANALYSED",
+      "time": 24.319844,
+      "detail": "0.42s @-35dB \u2192 0.41s @-40dB, confirmed"
+    },
+    {
+      "step": 23,
+      "action": "SHIFTED",
+      "time": 24.269,
+      "detail": "-0.43s \u2014 corrected -0.43s into 0.41s silence (24.12\u201324.53)"
+    },
+    {
+      "step": 24,
+      "action": "PROPOSED",
+      "time": 56.6,
+      "detail": "',' after \"timings,\", inside 1.31s silence"
+    },
+    {
+      "step": 25,
+      "action": "ACCEPTED",
+      "time": 56.6,
+      "detail": "confirmed inside 1.31s silence; padded +0.06s"
+    },
+    {
+      "step": 26,
+      "action": "PROPOSED",
+      "time": 68.2098125,
+      "detail": "0.87s silence between content words \"loop\" and \"this\" \u2014 transcript may be missin"
+    },
+    {
+      "step": 27,
+      "action": "REJECTED",
+      "time": 68.2098125,
+      "detail": "would leave a 1.43s clip against the cut at 66.78s"
+    },
+    {
+      "step": 28,
+      "action": "PROPOSED",
+      "time": 112.98,
+      "detail": "'.' after \"you.\" but no silence within 0.35s \u2014 punctuation may reflect grammar r"
+    },
+    {
+      "step": 29,
+      "action": "REJECTED",
+      "time": 112.98,
+      "detail": "no silence within 0.75s \u2014 transcript asserts a boundary the audio does not support"
+    },
+    {
+      "step": 30,
+      "action": "PROPOSED",
+      "time": 54.68,
+      "detail": "',' after \"detection,\"; nearest silence begins 0.23s away \u2014 routine drift, snap "
+    },
+    {
+      "step": 31,
+      "action": "REJECTED",
+      "time": 54.68,
+      "detail": "would leave a 1.46s clip against the cut at 56.66s"
+    },
+    {
+      "step": 32,
+      "action": "PROPOSED",
+      "time": 59.757000000000005,
+      "detail": "0.61s silence between content words \"passing\" and \"conflict\" \u2014 transcript may be"
+    },
+    {
+      "step": 33,
+      "action": "ACCEPTED",
+      "time": 59.757000000000005,
+      "detail": "confirmed inside 0.61s silence; padded -0.15s"
+    },
+    {
+      "step": 34,
+      "action": "PROPOSED",
+      "time": 76.26,
+      "detail": "',' after \"quiet,\"; nearest silence begins 0.30s away \u2014 routine drift, snap to a"
+    },
+    {
+      "step": 35,
+      "action": "RE-ANALYSED",
+      "time": 76.7325625,
+      "detail": "0.35s @-35dB \u2192 0.31s @-40dB, confirmed"
+    },
+    {
+      "step": 36,
+      "action": "SHIFTED",
+      "time": 76.749,
+      "detail": "+0.49s \u2014 corrected +0.49s into 0.31s silence (76.60\u201376.91)"
+    },
+    {
+      "step": 37,
+      "action": "PROPOSED",
+      "time": 82.34,
+      "detail": "',' after \"disagree,\"; nearest silence begins 0.32s away \u2014 routine drift, snap t"
+    },
+    {
+      "step": 38,
+      "action": "SHIFTED",
+      "time": 82.813,
+      "detail": "+0.47s \u2014 corrected +0.47s into 0.94s silence (82.66\u201383.61)"
+    },
+    {
+      "step": 39,
+      "action": "PROPOSED",
+      "time": 92.5,
+      "detail": "',' after \"handled,\"; nearest silence begins 0.22s away \u2014 routine drift, snap to"
+    },
+    {
+      "step": 40,
+      "action": "SHIFTED",
+      "time": 92.871,
+      "detail": "+0.37s \u2014 corrected +0.37s into 0.52s silence (92.72\u201393.24)"
+    },
+    {
+      "step": 41,
+      "action": "PROPOSED",
+      "time": 96.46,
+      "detail": "',' after \"speakers,\"; nearest silence begins 0.09s away \u2014 routine drift, snap t"
+    },
+    {
+      "step": 42,
+      "action": "SHIFTED",
+      "time": 96.695,
+      "detail": "+0.23s \u2014 corrected +0.23s into 1.00s silence (96.55\u201397.55)"
+    },
+    {
+      "step": 43,
+      "action": "PROPOSED",
+      "time": 111.22,
+      "detail": "',' after \"recording,\"; nearest silence begins 0.26s away \u2014 routine drift, snap "
+    },
+    {
+      "step": 44,
+      "action": "RE-ANALYSED",
+      "time": 111.70406299999999,
+      "detail": "0.45s @-35dB \u2192 0.44s @-40dB, confirmed"
+    },
+    {
+      "step": 45,
+      "action": "SHIFTED",
+      "time": 111.635,
+      "detail": "+0.42s \u2014 corrected +0.42s into 0.44s silence (111.48\u2013111.93)"
+    },
+    {
+      "step": 46,
+      "action": "PROPOSED",
+      "time": 33.987469000000004,
+      "detail": "5.54s silence but preceded by \"was\" \u2014 hesitation mid-clause, not a boundary"
+    },
+    {
+      "step": 47,
+      "action": "REJECTED",
+      "time": 33.987469000000004,
+      "detail": "confidence 0.15 below threshold 0.3 \u2014 acoustics_without_semantics"
+    },
+    {
+      "step": 48,
+      "action": "PROPOSED",
+      "time": 45.6661875,
+      "detail": "3.14s silence but preceded by \"is\" \u2014 hesitation mid-clause, not a boundary"
+    },
+    {
+      "step": 49,
+      "action": "REJECTED",
+      "time": 45.6661875,
+      "detail": "confidence 0.15 below threshold 0.3 \u2014 acoustics_without_semantics"
+    },
+    {
+      "step": 50,
+      "action": "PROPOSED",
+      "time": 63.0350625,
+      "detail": "3.07s silence but followed by \"and\" \u2014 hesitation mid-clause, not a boundary"
+    },
+    {
+      "step": 51,
+      "action": "REJECTED",
+      "time": 63.0350625,
+      "detail": "confidence 0.15 below threshold 0.3 \u2014 acoustics_without_semantics"
+    },
+    {
+      "step": 52,
+      "action": "PROPOSED",
+      "time": 99.8681875,
+      "detail": "3.49s silence but preceded by \"but\" \u2014 hesitation mid-clause, not a boundary"
+    },
+    {
+      "step": 53,
+      "action": "REJECTED",
+      "time": 99.8681875,
+      "detail": "confidence 0.15 below threshold 0.3 \u2014 acoustics_without_semantics"
+    },
+    {
+      "step": 54,
+      "action": "PROPOSED",
+      "time": 103.977719,
+      "detail": "1.08s silence but followed by \"for\" \u2014 hesitation mid-clause, not a boundary"
+    },
+    {
+      "step": 55,
+      "action": "REJECTED",
+      "time": 103.977719,
+      "detail": "confidence 0.15 below threshold 0.3 \u2014 acoustics_without_semantics"
+    }
+  ]
+}
