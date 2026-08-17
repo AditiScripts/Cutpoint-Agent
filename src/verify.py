@@ -101,7 +101,6 @@ def verify_one(plan: CutPlan, cut: Cut, silences: List[SilenceWindow]) -> None:
     #    would move to 11.19s, leaving 2.4s of silence at the end of the clip.
     #    A small trailing pad preserves natural breathing room without it.
     TRAILING_PAD_S = 0.15
-    # 6. Land just after speech stops rather than mid-pause.
     target = round(min(window.start + TRAILING_PAD_S, window.midpoint), 3)
 
     # Distinguish padding from correction. A cut already inside real silence

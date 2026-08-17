@@ -1,10 +1,23 @@
 """Audio analysis tool.
 
 This is the agent's only source of direct evidence about the recording.
-The transcript and word timings are claims; this module makes measurements.
 
-Designed to be called on demand — including repeatedly on a narrow window
-with a different threshold when the agent is uncertain about a decision.
+The design rests on a distinction: the transcript and the word timings are
+both *claims* produced by models.
+
+Punctuation is a claim that a thought ended.
+Word timings are a claim about when speech occurred.
+Neutiher is a measurement.
+
+This module is the only place that measures anything — it reads
+the waveform and reports where energy actually falls below a threshold.
+That is why I've made it a structured as a callable tool rather than a preprocessing
+step.
+
+The agent runs it once over the whole file to establish ground truth,
+then calls it again on narrow windows, at stricter thresholds, whenever a
+decision turns out to falter on evidence it is not sure about.
+
 """
 
 import re
@@ -14,34 +27,62 @@ from typing import List, Optional
 
 
 # Two silences separated by less than this are treated as one.
-# Justified by observed sub-10ms artefacts (e.g. a 1.4ms "speech" gap at
-# 3.835s) caused by transients briefly crossing the threshold.
+#
+# silencedetect reports instantaneous threshold crossings, so a click, or fan 
+# spike (for examlpe) can briefly poke above the noise floor and split one
+# real pause into two windows. The sample recording contains a 1.4ms "speech"
+# gap at 3.835s — nobody speaks for 1.4ms. Without merging, the agent sees
+# two 1.7s windows where there is one 3.4s window and may snap a cut to the
+# wrong half. 50ms is a compromise: large enough to absorb transients, small
+# enough not to swallow genuine short utterances.
 MERGE_GAP_S = 0.05
 
-# Silences shorter than this are not usable as cut points.
+# Silences shorter than this are not usable as cut points. A 0.2s pause is
+# a breath boundary, not an editorial one.
 MIN_SILENCE_S = 0.25
 
 # Cuts are never placed within this distance of the start or end of the file.
+# A cut at 1.5s produces a first clip containing nothing but room tone.
 EDGE_MARGIN_S = 2.0
 
-# Default threshold, chosen by sweep — see README.
+# Chosen by sweeping -30/-35/-40/-45dB and measuring total silence, not
+# window count. Below -40dB the count rises while total silence halves:
+# the room's noise floor sits near -42dB, so room tone repeatedly crosses
+# the threshold and fragments real pauses. -30 and -35 give near-identical
+# results, indicating a stable plateau. See README for the full table.
 DEFAULT_THRESHOLD_DB = -35
 
 
 @dataclass
 class SilenceWindow:
+    """A measured interval where audio energy stayed below the threshold.
+
+    Carries threshold_db so a window's provenance is never ambiguous — a
+    window found at -40dB during re-analysis is a different kind of evidence
+    from one found at -35dB in the initial sweep, and the audit log needs to
+    be able to say which.
+    """
+    
     start: float
     end: float
     threshold_db: int
-
+    
+    # Length of the pause. The primary confidence signal: a 3s silence is
+    # strong evidence of a boundary, a 0.3s silence is weak.
     @property
     def duration(self) -> float:
         return self.end - self.start
-
+    
+    # The agent doesn't cut here
+    # trailing-pad rationale in verify.py. Cutting mid-pause leaves dead air
+    # at the end of one clip and the start of the next.
     @property
     def midpoint(self) -> float:
         return (self.start + self.end) / 2
 
+    # Inclusive on both edges. Used to distinguish "the audio confirms this
+    # cut" from "the audio has silence nearby that I must move to" - a
+    # distinction that shows up as ACCEPTED vs SHIFTED in the audit log.
     def contains(self, t: float) -> bool:
         return self.start <= t <= self.end
 
@@ -51,7 +92,18 @@ class SilenceWindow:
 
 def _run_silencedetect(wav_path: str, threshold_db: int, min_duration: float,
                        start: Optional[float], end: Optional[float]) -> str:
-    """Call ffmpeg and return its stderr, where silencedetect writes."""
+    """Shell out to ffmpeg's silencedetect filter.
+
+    Two details that matter:
+
+    -ss is placed BEFORE -i, which makes ffmpeg seek before decoding rather
+    than decoding the whole file and discarding. Windowed re-analysis is
+    therefore fast enough to run inside the verification loop.
+
+    silencedetect writes to stderr, not stdout, so the return value is
+    result.stderr. Piping stdout returns nothing.
+    """
+    
     cmd = ["ffmpeg"]
     if start is not None:
         cmd += ["-ss", str(start)]
@@ -67,11 +119,20 @@ def _run_silencedetect(wav_path: str, threshold_db: int, min_duration: float,
 
 
 def _parse(stderr: str, threshold_db: int, offset: float) -> List[SilenceWindow]:
-    """Turn ffmpeg's stderr into SilenceWindow objects.
+    """Convert ffmpeg's stderr into SilenceWindow objects.
 
-    silencedetect emits start and end on separate lines, so they are paired
-    as they appear. An unclosed final start means silence ran to end of file.
+    silencedetect emits silence_start and silence_end on separate lines, so
+    they are paired in order of appearance.
+
+    `offset` shifts timestamps back into whole-file coordinates. When -ss
+    seeks to 29.0s, ffmpeg reports times relative to that seek point, so a
+    window reported at 2.2s is really at 31.2s. Without this, re-analysis
+    results would be silently wrong.
+
+    max(0.0, ...) guards against ffmpeg occasionally reporting a small
+    negative start on the first window.
     """
+    
     windows = []
     pending_start = None
 

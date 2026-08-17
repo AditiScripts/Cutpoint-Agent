@@ -1,4 +1,4 @@
-"""Propose candidate cut points from the transcript and from word timings.
+"""Candidate cut points from the transcript and from word timings.
 
 The two sources are generated independently and never merged here. Keeping
 them apart is what makes disagreement visible to the conflict stage.
@@ -96,7 +96,11 @@ def from_transcript(aligned: List[dict]) -> List[Candidate]:
     candidates = []
 
     for i, tok in enumerate(aligned):
-        trailing = tok["token"][-1] if tok["token"] else ""
+        # Strip closing quotes and brackets so `later."` still registers as
+        # a full stop. Only the last character is inspected, so a token
+        # ending in a quote would otherwise be skipped entirely.
+        stripped = tok["token"].rstrip('"\')]}»')
+        trailing = stripped[-1] if stripped else ""
         if trailing not in PUNCT_STRENGTH:
             continue
 
@@ -133,6 +137,9 @@ def from_timing(words: List[dict]) -> List[Candidate]:
         gap = nxt["start"] - cur["end"]
 
         if gap >= MIN_TIMING_GAP_S:
+            # Longer gaps are stronger evidence, capped at 0.75 so a timing
+            # gap never outranks a full stop (0.90). Timings are a model's
+            # estimate; punctuation is an assertion about meaning.
             strength = min(0.75, 0.30 + gap * 0.30)
             candidates.append(Candidate(
                 time=round(cur["end"] + gap / 2, 3),
