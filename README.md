@@ -344,3 +344,11 @@ errors fixed and punctuation adjusted to match intent. This is the realistic
 scenario - an editing workflow has a human-authored script on one side and raw
 machine timings on the other - and it makes the two sources genuinely
 independent artifacts rather than two views of the same Whisper output.
+
+Two of the twelve planted cases did not behave as intended. The run-on at
+0:20-0:26 was meant to have no pause at the sentence boundary, but I left a
+0.42s gap, so it became a weak-evidence case that the agent kept (after
+re-analysis) rather than a clean rejection. And the breath at ~1:12 falls
+inside a 3.16s silence window; the agent happens to cut before it, at 71.62s,
+but only because the punctuation pointed there - it has no way to detect the
+breath itself.
