@@ -352,3 +352,15 @@ re-analysis) rather than a clean rejection. And the breath at ~1:12 falls
 inside a 3.16s silence window; the agent happens to cut before it, at 71.62s,
 but only because the punctuation pointed there - it has no way to detect the
 breath itself.
+
+## Notes on AI usage
+
+I used Generative AI while building this, mainly for:
+- scaffolding
+- helping with architectural design
+- understanding and explanations of concepts I struggled to understand
+- the assymetric function-word rule for separating hesitation from a missing boundary
+- the decision to cut at
+`silence.start + 0.15s` rather than the midpoint, after seeing that midpoint snapping moved a cut 2.43s into dead air.
+
+Every constant in the code is either derived from a measurement on the sample recording or flagged as a judgement call in the limitations above.
