@@ -61,16 +61,51 @@ Outputs land in `output/`: `cuts.json` (machine-readable) and `decisions.md`
 [`example_output/`](example_output/).
 
 ## Architecture
-video.mp4
-├─→ audio.wav ──→ silence detection ────→ ground truth: where it IS quiet
-├─→ Whisper ────→ word timings ─────────→ claim: when words were spoken
-└─→ transcript ─→ punctuation ──────────→ claim: where thoughts ended
-│
-conflict classification
-│
-verification loop ──→ accept / correct / reject
-│
-cuts.json + decisions.md
+```mermaid
+flowchart TD
+    V["sample.mp4"] --> W["audio.wav<br/><i>16kHz mono</i>"]
+    V --> T["transcribe.py<br/><i>Whisper</i>"]
+    T --> WJ["words.json<br/><i>word timings</i>"]
+    TX["transcript_corrected.txt<br/><i>human-corrected</i>"]
+
+    W --> A["audio.py<br/><b>measures silence</b>"]
+    WJ --> C["candidates.py"]
+    TX --> C
+
+    A -->|"ground truth"| CF["conflicts.py<br/><b>classifies disagreement</b>"]
+    C -->|"proposals"| CF
+    CF --> VF["verify.py<br/><b>accept · correct · reject</b>"]
+
+    VF <-->|"reads and writes"| ST["state.py<br/><i>plan and audit log</i>"]
+    VF -.->|"re-analyse narrow window<br/>at stricter threshold"| A
+    VF --> R["report.py"]
+    R --> O["cuts.json<br/>decisions.md"]
+
+    classDef input fill:#f1efe8,stroke:#888780,color:#2c2c2a
+    classDef tool fill:#e1f5ee,stroke:#0f6e56,color:#04342c
+    classDef logic fill:#eeedfe,stroke:#534ab7,color:#26215c
+    classDef decide fill:#faece7,stroke:#993c1d,color:#4a1b0c
+
+    class V,W,WJ,TX input
+    class A tool
+    class T,C,CF,R logic
+    class VF decide
+    class ST,O input
+```
+
+Two edges carry the design. The **dashed line** from `verify.py` back to
+`audio.py` is `reanalyse()` - when a silence window is short enough that its
+edges may be a threshold artefact, the agent re-measures that specific window
+at -40dB rather than guessing. Three of these fire on the sample recording.
+
+The **bidirectional edge** to `state.py` is why decisions are not independent.
+Accepting a cut consumes a silence window; later proposals read that state and
+can be rejected because of it. 
+
+Note that `audio.py` is called twice in different modes: once over the whole
+file to establish ground truth, then repeatedly on narrow windows from inside
+the verification loop. It is a tool the agent invokes, not a preprocessing
+step.
 
 | Module | Responsibility |
 |---|---|
@@ -89,6 +124,8 @@ Three such re-analyses fire on the sample recording.
 
 ## Conflict taxonomy
 
+These are the five categories the agent sorts every proposal into.
+
 | Type | Condition | Resolution |
 |---|---|---|
 | `agreement` | Punctuation inside a silence window | Accept, pad slightly |
@@ -99,28 +136,33 @@ Three such re-analyses fire on the sample recording.
 
 ### Distinguishing hesitation from a missing boundary
 
-The hard case is a long silence with no punctuation. Two possible causes: the
-transcript is missing a mark, or the speaker stalled mid-clause. The
-discriminator is the words on either side.
+The hard case is a long silence with no punctuation. Two possible causes are: the
+transcript is missing a mark, or the speaker stalled mid-clause. The agent decides using the word immediately before the silence and the word immediately after it.
 
-Speakers do not finish thoughts on *"and"*, *"was"*, or *"for"* — but they
-routinely begin them with *"this"* or *"the"*. So the check is asymmetric: a
-narrow set of words that rarely *begin* a thought, and a broad set that rarely
-*end* one.
+The rule relies on asymmetry in English. Speakers almost never *finish* a thought on a function word - "and", "was", "for", "the" and leave sentences grammatically incomplete, so a pause after one is a stall. But they very often *start* a thought with one - "this", "the", "I" all open sentences quite normally.
 
-Every unexplained silence in the sample recording is bounded by a function
-word, and all five are correctly rejected as hesitations:
+So the two sides get different word lists. "The" counts as a stall signal when
+it comes *before* a silence, but not when it comes *after*. Using one shared
+list caused a false positive at 68.21s, where a genuine boundary before "This
+next part is..." was misread as hesitation.
 
-| Time | Duration | Bounded by | Verdict |
+Every unexplained silence in the sample recording is bounded by a stall word,
+and all five are correctly rejected:
+
+| Time | Duration | Stall word | Side |
 |---|---|---|---|
-| 33.99s | 5.54s | "was" | hesitation |
-| 45.67s | 3.14s | "is" | hesitation |
-| 63.04s | 3.07s | "and" | hesitation |
-| 99.87s | 3.49s | "but" | hesitation |
-| 103.98s | 1.08s | "for" | hesitation |
+| 33.99s | 5.54s | "was" | before |
+| 45.67s | 3.14s | "is" | before |
+| 63.04s | 3.07s | "and" | after |
+| 99.87s | 3.49s | "but" | before |
+| 103.98s | 1.08s | "for" | after |
 
 **The four longest pauses in the recording are all places the agent refuses to
-cut.** A system that simply cut on silence would slice five sentences in half.
+cut.** A system that cut on silence alone would slice five sentences in half.
+
+Two other unexplained silences (59.76s and 68.21s) have content words (nouns, verbs, adjectives...) on both
+sides, so they are treated as possible missing punctuation instead - usable,
+but at lower confidence than explicit punctuation.
 
 ## Findings from the sample recording
 
@@ -130,19 +172,21 @@ planted; annotations are in
 
 ### Word timings cannot locate pauses
 
-Whisper reports the word *"ship"* as spanning **31.28s to 36.92s - 5.64
-seconds**. The word takes about a quarter of a second. The aligner had a 5.5s
-silence it could not attribute and stretched the preceding word across it.
+Whisper says the word "ship" runs from 31.28s to 36.92s - **5.64 seconds**.
+The word takes about a quarter of a second. There was a 5.5s silence there,
+and the aligner had nowhere to put it, so it stretched the previous word
+across the gap.
 
-The consequence is that gap-based pause detection (`next.start - current.end`)
-reports **zero gap** at the largest pause in the recording. This is why the
-agent verifies against the waveform rather than trusting timings.
+This matters because the obvious way to find pauses is to look for gaps
+between words (`next.start - current.end`). At the biggest pause in the whole
+recording, that gap is **zero**. The words are reported back-to-back. This is
+the reason the agent measures the waveform instead of trusting the timings.
 
-Turning that failure into a signal: any single word longer than 1.5s marks a
-suspect alignment region. On the sample, this flags six words, and **all six
-sit on a real silence window** - 6/6 precision:
+The failure can be turned into a signal: any single word longer than 1.5s
+means the aligner absorbed a pause. Six words are flagged, and **all six sit
+on a real silence window**:
 
-| Flagged word | Duration | Silence window found |
+| Flagged word | Duration | Silence found there |
 |---|---|---|
 | "ship" | 5.64s | 31.22–36.76 |
 | "that" | 2.88s | 44.09–47.24 |
@@ -151,42 +195,48 @@ sit on a real silence window** - 6/6 precision:
 | "those" | 4.10s | 98.12–101.61 |
 | "for" | 1.56s | 103.44–104.52 |
 
-### Choosing the silence threshold
+### Picking the silence threshold
 
-Swept across four values:
+Four values were tested:
 
-| Threshold | Windows | Total silence |
+| Threshold | Windows found | Total silence |
 |---|---|---|
 | -30 dB | 36 | 63.6s |
 | -35 dB | 35 | 59.6s |
 | -40 dB | 42 | 54.7s |
 | -45 dB | 51 | 29.6s |
 
-Window count *rises* below -40dB while total silence *falls sharply* - the
-room's noise floor sits near -42dB, so at -45dB room tone repeatedly crosses
-the threshold and shreds single pauses into fragments. -30 and -35 give nearly
-identical counts, indicating a stable plateau. **-35dB was chosen** for sitting
-on that plateau, comfortably above the noise floor.
+The window count goes *up* below -40dB while total silence *halves* - which
+looks backwards until you see why. The room's background noise sits around
+-42dB. At -45dB that noise keeps crossing the threshold, so one long pause
+gets chopped into several short fragments. More windows, less real silence.
 
-Detection also produces sub-10ms artefacts (a 1.4ms "speech" gap at 3.835s,
-caused by a transient) which the agent merges before use.
+-30dB and -35dB give almost the same result, which means the value doesn't
+matter much in that range. **-35dB was chosen** for sitting
+on it, safely above the noise floor.
 
-### Alignment drift is systematic
+Detection also throws out tiny artefacts: a 1.4ms "speech" gap at 3.835s,
+caused by a click or similar. The agent merges windows closer than 50ms so a
+single pause doesn't appear as two.
 
-Transcript-derived cuts land consistently 0.02–0.32s *before* the silence
-window begins, never after. Word-end timestamps mark the last phoneme, but
-audio energy takes a moment to decay below threshold. The drift is small,
-one-directional, and predictable, so it is treated as expected behaviour
-rather than conflict: cuts within 0.35s are corrected to the audio without
-lowering confidence.
+### Punctuation lands slightly early, always
 
-### Cut placement
+Cuts proposed from punctuation land 0.02–0.32s *before* the silence begins,
+never after. The reason is simple: the word timestamp marks the last sound of
+the word, but the audio takes a moment to fade below the threshold.
 
-Cuts land at `silence.start + 0.15s` rather than the midpoint of the silence.
-Snapping to the midpoint sounds reasonable but produces bad edits: a full stop
-at 8.76s would move to 11.19s, leaving 2.4 seconds of dead air at the end of
-the clip and another 2.4 seconds at the start of the next one. A short trailing
-pad preserves natural breathing room without burying the cut in silence.
+Because the error is small and always in the same direction, it's treated as
+expected rather than as a conflict. Cuts within 0.35s are moved to the audio
+with no confidence penalty.
+
+### Where the cut actually lands
+
+Cuts go at `silence.start + 0.15s`, not the middle of the silence.
+
+Cutting mid-pause sounds sensible but makes bad edits. The full stop at 8.76s
+sits inside a 4.75s silence, so the midpoint would be 11.19s - leaving 2.4
+seconds of dead air at the end of one clip and another 2.4 seconds at the
+start of the next. A short pad keeps a natural breath of space instead.
 
 ## Results on the sample
 
@@ -199,58 +249,53 @@ pad preserves natural breathing room without burying the cut in silence.
 | Final cut points | 18 |
 | Targeted re-analyses | 3 |
 
-Three decisions worth reading in full in
+Three decisions worth reading in
 [`example_output/decisions.md`](example_output/decisions.md):
 
-**112.98s - punctuation the audio does not support.** The transcript's final
-full stop after "you." has no silence within 0.75s. The agent rejects it. This
-is the resolution principle applied at its sharpest: strong semantic evidence,
-no acoustic support, no cut.
+**112.98s - punctuation with nothing behind it.** The transcript's last full
+stop, after "you.", has no silence within 0.75s. Rejected. This is the
+principle at its sharpest: the transcript is certain, the audio disagrees, no
+cut.
 
-**24.27s - the agent correcting backwards.** A semicolon at 24.70s was proposed
-from the transcript. The nearest silence *ended* 0.17s earlier, at 24.53s. The
-window was short enough (0.42s) to be uncertain, so the agent re-analysed that
-region at -40dB, confirmed 0.41s of genuine silence, and corrected the cut
+**24.27s - the agent correcting itself backwards.** A semicolon proposed a cut
+at 24.70s. The nearest silence had already *ended* by then, 0.17s earlier. At
+0.42s that window was short enough to be doubtful, so the agent re-measured
+just that region at -40dB, found 0.41s of real silence, and moved the cut
 0.43s *backwards* into it. Planned, tested, re-planned.
 
-**54.68s - a strong cut losing to a weak one.** A full stop (confidence 0.90)
-was rejected because a comma at 56.66s (confidence 0.40) had already claimed
-the space, and cutting both would leave a 1.46s clip. See limitations below.
+**54.68s - a strong cut losing to a weak one.** A full stop (0.90 confidence)
+was rejected because a comma at 56.66s (0.40 confidence) had already taken the
+space, and keeping both would leave a 1.46s clip. This is a flaw, not a
+feature - see below.
 
 ## Limitations
 
-**Processing order affects outcomes.** Proposals are verified in descending
-confidence order, but the minimum-clip-length rule means whichever cut is
-processed *first* claims the space. At 54.68s a 0.90-confidence full stop is
-rejected in favour of an already-accepted 0.40-confidence comma. Correct
-behaviour would evaluate clusters of competing candidates jointly and keep the
-strongest, rather than resolving pairwise in arrival order. This is the clearest
-known flaw in the current implementation.
+**Processing order changes the outcome.** Proposals are checked in order of
+confidence, but the minimum-clip rule means whichever cut is checked *first*
+claims the space. At 54.68s a 0.90-confidence full stop loses to a
+0.40-confidence comma that was already accepted. The fix is to look at all
+candidates competing for the same region together and keep the strongest,
+rather than comparing them one pair at a time. This is the clearest known flaw
+in the implementation.
 
-**Hesitation detection is a heuristic.** The function-word discriminator scores
-6/6 on this recording, but it is a lexical proxy for a prosodic question. It
-will fail on speakers whose delivery does not match the assumption - slow,
-deliberate speech that genuinely ends clauses on prepositions, or languages
-with different word order. Forced alignment or a prosodic model would be the
-principled replacement.
+**The hesitation rule is a heuristic.** It gets all five cases right on this
+recording, but it's guessing at delivery from word choice. It will fail on
+speakers who genuinely do end clauses on prepositions, on slow deliberate
+speech, and on languages with different word order. Forced alignment or a
+prosodic model would be the real answer.
 
-**Silence detection is sensitive to re-encoding.** Re-encoding the source video
-to a different audio codec shifted quantisation noise enough to change window
-boundaries: one additional 0.26s window appeared and another extended by 0.12s.
-No cut decisions changed, but a fixed dB threshold is not robust to generational
-transcoding. An adaptive threshold derived from the measured noise floor would
-be.
+**Silence detection is sensitive to re-encoding.** Re-encoding the source
+video's audio shifted the numbers slightly: one extra 0.26s window appeared
+and another grew by 0.12s. No cut decisions changed, but a fixed dB threshold
+isn't robust to that. Measuring the noise floor per-file would be.
 
-**The merge constant is a compromise.** Silence windows separated by less than
-50ms are merged as detection artefacts. At 67.67–67.78s a real 0.11s gap
-survives, leaving one pause split across two windows. A larger constant would
-merge it but risks absorbing genuine short utterances.
+**The 50ms merge constant is a compromise.** At 67.67–67.78s there's a real
+0.11s gap, so one pause stays split across two windows. Raising the constant
+would merge it, but risks swallowing genuinely short utterances.
 
-**Single speaker, clean recording, no music.** Overlapping speech, background
-music, and speaker changes are all untested and would likely break the silence
-assumption entirely.
-
-**No frame-accurate export.** See below.
+**One speaker, quiet room, no music.** Overlapping speech, background music and
+speaker changes are all untested and would probably break the silence
+assumption outright.
 
 ## What I would do next
 
@@ -272,18 +317,17 @@ tradeoff I would want to make deliberately rather than by default.
 **Breath detection.** Breaths are low-energy but not silent, and cutting on one
 sounds wrong. The sample contains a deliberate breath at ~72s that is currently
 swallowed inside a detected silence window. Spectral analysis would separate
-them.
+them (Fourier Analysis - looks at the frequencies present in a sound whereas here total loudness was the main thing measured).
 
 **Measure against ground truth.** `sample/ground_truth_notes.md` contains
 hand-annotated speech boundaries. Scoring the agent's cut placement against
-them — median offset, precision, recall - would turn "it works" into a number.
+them - median offset, precision, recall - would turn "it works" into a number.
 I ran out of time for this and consider it the most significant gap.
 
 **An LLM adjudicator for genuinely ambiguous cases.** The function-word
 heuristic handles the clear cases. For the rest, passing surrounding context to
 a language model and asking it to judge hesitation-versus-boundary would likely
-outperform lexical rules - with the deterministic verifier retained as a
-guardrail, so a model suggestion still has to survive audio verification.
+outperform lexical rules. The audio check would stay exactly as it is. THe model would only get to propose; the waveform would still decide where the cut can land. So a model that guessed wrong couldn't put a cut somewhere the audio doesn't support.
 
 ## Notes on the sample recording
 
