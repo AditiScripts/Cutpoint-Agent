@@ -10,7 +10,7 @@ Punctuation tells you where a sentence *should* end. It does not tell you
 whether the speaker actually paused there. Word timings from an ASR model are
 an estimate, not a measurement. Only the audio itself is direct evidence.
 
-These three sources disagree constantly, and the disagreements are not noise —
+These three sources disagree constantly, and the disagreements are not noise -
 they are the signal. A full stop with no pause behind it usually means the
 speaker ran two sentences together. A three-second silence with no punctuation
 usually means they hesitated mid-thought. Cutting on either produces a bad clip.
@@ -80,7 +80,7 @@ cuts.json + decisions.md
 | `src/conflicts.py` | Classifies disagreements and assigns confidence. |
 | `src/verify.py` | Tests each proposal against audio; accepts, corrects, or rejects. |
 | `src/state.py` | Shared plan state and append-only audit log. |
-| `src/report.py` | Machine- and human-readable output. |
+| `src/report.py` | Machine and human-readable output. |
 
 Silence detection is a **tool the agent calls**, not a preprocessing step. When
 a candidate window is short enough to be ambiguous (<0.50s), the agent
@@ -130,7 +130,7 @@ planted; annotations are in
 
 ### Word timings cannot locate pauses
 
-Whisper reports the word *"ship"* as spanning **31.28s to 36.92s — 5.64
+Whisper reports the word *"ship"* as spanning **31.28s to 36.92s - 5.64
 seconds**. The word takes about a quarter of a second. The aligner had a 5.5s
 silence it could not attribute and stretched the preceding word across it.
 
@@ -140,7 +140,7 @@ agent verifies against the waveform rather than trusting timings.
 
 Turning that failure into a signal: any single word longer than 1.5s marks a
 suspect alignment region. On the sample, this flags six words, and **all six
-sit on a real silence window** — 6/6 precision:
+sit on a real silence window** - 6/6 precision:
 
 | Flagged word | Duration | Silence window found |
 |---|---|---|
@@ -162,7 +162,7 @@ Swept across four values:
 | -40 dB | 42 | 54.7s |
 | -45 dB | 51 | 29.6s |
 
-Window count *rises* below -40dB while total silence *falls sharply* — the
+Window count *rises* below -40dB while total silence *falls sharply* - the
 room's noise floor sits near -42dB, so at -45dB room tone repeatedly crosses
 the threshold and shreds single pauses into fragments. -30 and -35 give nearly
 identical counts, indicating a stable plateau. **-35dB was chosen** for sitting
@@ -202,18 +202,18 @@ pad preserves natural breathing room without burying the cut in silence.
 Three decisions worth reading in full in
 [`example_output/decisions.md`](example_output/decisions.md):
 
-**112.98s — punctuation the audio does not support.** The transcript's final
+**112.98s - punctuation the audio does not support.** The transcript's final
 full stop after "you." has no silence within 0.75s. The agent rejects it. This
 is the resolution principle applied at its sharpest: strong semantic evidence,
 no acoustic support, no cut.
 
-**24.27s — the agent correcting backwards.** A semicolon at 24.70s was proposed
+**24.27s - the agent correcting backwards.** A semicolon at 24.70s was proposed
 from the transcript. The nearest silence *ended* 0.17s earlier, at 24.53s. The
 window was short enough (0.42s) to be uncertain, so the agent re-analysed that
 region at -40dB, confirmed 0.41s of genuine silence, and corrected the cut
 0.43s *backwards* into it. Planned, tested, re-planned.
 
-**54.68s — a strong cut losing to a weak one.** A full stop (confidence 0.90)
+**54.68s - a strong cut losing to a weak one.** A full stop (confidence 0.90)
 was rejected because a comma at 56.66s (confidence 0.40) had already claimed
 the space, and cutting both would leave a 1.46s clip. See limitations below.
 
@@ -229,7 +229,7 @@ known flaw in the current implementation.
 
 **Hesitation detection is a heuristic.** The function-word discriminator scores
 6/6 on this recording, but it is a lexical proxy for a prosodic question. It
-will fail on speakers whose delivery does not match the assumption — slow,
+will fail on speakers whose delivery does not match the assumption - slow,
 deliberate speech that genuinely ends clauses on prepositions, or languages
 with different word order. Forced alignment or a prosodic model would be the
 principled replacement.
@@ -276,13 +276,13 @@ them.
 
 **Measure against ground truth.** `sample/ground_truth_notes.md` contains
 hand-annotated speech boundaries. Scoring the agent's cut placement against
-them — median offset, precision, recall — would turn "it works" into a number.
+them — median offset, precision, recall - would turn "it works" into a number.
 I ran out of time for this and consider it the most significant gap.
 
 **An LLM adjudicator for genuinely ambiguous cases.** The function-word
 heuristic handles the clear cases. For the rest, passing surrounding context to
 a language model and asking it to judge hesitation-versus-boundary would likely
-outperform lexical rules — with the deterministic verifier retained as a
+outperform lexical rules - with the deterministic verifier retained as a
 guardrail, so a model suggestion still has to survive audio verification.
 
 ## Notes on the sample recording
@@ -292,11 +292,11 @@ that ground truth is known. It deliberately contains: sentences run together
 with no pause, a 5.5s mid-clause hesitation, a filler-word hesitation, a flatly
 read list, an audible breath, and a comma-length pause. Whisper also
 mistranscribes "parsing" as "passing", which is left uncorrected in
-`output/transcript.txt` — it is honest evidence that ASR output is unreliable,
+`output/transcript.txt` - it is honest evidence that ASR output is unreliable,
 which is the premise the whole design rests on.
 
 `sample/transcript_corrected.txt` represents a human-corrected transcript: ASR
 errors fixed and punctuation adjusted to match intent. This is the realistic
-scenario — an editing workflow has a human-authored script on one side and raw
-machine timings on the other — and it makes the two sources genuinely
+scenario - an editing workflow has a human-authored script on one side and raw
+machine timings on the other - and it makes the two sources genuinely
 independent artifacts rather than two views of the same Whisper output.
